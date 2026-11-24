@@ -15,23 +15,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      WHATSAPP_NUMBER: ${{ vars.WHATSAPP_NUMBER }}
+      PHONE_DISPLAY: ${{ vars.PHONE_DISPLAY }}
+      EMAIL: ${{ vars.EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject variables
+        run: |
+          if [ -n "$WHATSAPP_NUMBER" ]; then
+            sed -i "s/923001234567/$WHATSAPP_NUMBER/g" lawyer-portfolio/index.html lawyer-portfolio/js/script.js
+          fi
+          if [ -n "$PHONE_DISPLAY" ]; then
+            sed -i "s/+92 300 1234567/$PHONE_DISPLAY/g" lawyer-portfolio/index.html
+          fi
+          if [ -n "$EMAIL" ]; then
+            sed -i "s/info@ahmedrazakhan.com/$EMAIL/g" lawyer-portfolio/index.html
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: lawyer-portfolio
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: lawyer-portfolio
-
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v4
