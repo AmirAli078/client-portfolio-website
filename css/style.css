@@ -734,7 +734,7 @@ footer{
 
   nav{
     display:none;
-    position:fixed;
+    position:absolute;
     top:100%;left:0;right:0;
     background:linear-gradient(180deg, var(--ink) 0%, #0a1520 100%);
     flex-direction:column !important;
